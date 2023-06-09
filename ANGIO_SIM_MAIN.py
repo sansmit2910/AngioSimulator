@@ -3,6 +3,9 @@ import subprocess
 import pygame
 import tkinter as tk
 import cv2
+import signal
+import os
+import textwrap
 # initialize pygame
 # initialize pygame
 # initialize pygame
@@ -35,12 +38,16 @@ title_rect.center = screen.get_rect().center
 
 # render the instructions text
 font = pygame.font.SysFont(None, 50)
-instructions_text = font.render("Welcome to Angio Simulator, press r foot pedal to start, then press 1 for Native mode, 2 for Roadmap or 3 for DSA modes respectively")
-# get the size of the instructions text
-instructions_rect = instructions_text.get_rect()
+instructions = "Welcome to Angio Simulator, press r foot pedal to start, then press 1 for Native mode, 2 for Roadmap or 3 for DSA modes respectively"
 
-# position the instructions text below the title text
-instructions_rect.center = (title_rect.centerx, title_rect.bottom + 50)
+# Wrap the text
+instructions_wrapped = textwrap.wrap(instructions, width=50)
+
+# Render each line and blit them one after the other, with a line height as the vertical offset
+line_height = font.get_height()
+for i, line in enumerate(instructions_wrapped):
+    instructions_text = font.render(line, True, BLACK)
+    screen.blit(instructions_text, (20, title_rect.bottom + 50 + i*line_height))
 
 # set up the buttons
 button_width = 200
@@ -69,9 +76,8 @@ while running:
     # fill the screen with white
     screen.fill(WHITE)
 
-    # draw the title, instructions, and buttons
+    # draw the title and buttons
     screen.blit(title_text, title_rect)
-    screen.blit(instructions_text, instructions_rect)
     pygame.draw.rect(screen, BLACK, next_button)
     pygame.draw.rect(screen, BLACK, close_button)
     screen.blit(next_text, next_button)
@@ -120,42 +126,59 @@ def show_notification(text):
     label = tk.Label(frame, text=text, font=("Arial", 20), bg='black', fg='white', wraplength=500, justify="center")
     label.pack(fill="both", expand=True)
 
-    # Destroy the window after 3 seconds
+    # Destroy the window after 3 seconds22
     window.after(3000, window.destroy)
     window.mainloop()
 show_notification("ready for practise session")    
 pygame.quit()
-script_a_path = r"C:\Users\User\Desktop\Neuer Ordner\NATIV_01.py"
-script_b_path = r"C:\Users\User\Desktop\Neuer Ordner\ROADMAP_01.py"
-script_c_path = r"C:\Users\User\Desktop\Neuer Ordner\DSA_01.py"
+script_a_path = r"C:\Users\Smit\Downloads\NATIVE_01.py"
+script_b_path = r"C:\Users\Smit\Downloads\ROADMAP_02.py"
+script_c_path = r"C:\Users\Smit\Downloads\DSA_02.py"
+# Add this line at the top of your functions:
+current_process = None
 
 def start_script_a():
+    global current_process
+    if current_process is not None:
+        current_process.terminate()
+        current_process.wait()
     print("Starting script A...")
-    subprocess.call(["python", script_a_path])
+    current_process = subprocess.Popen(["python", script_a_path])
+    current_process.wait()
     print("Script A has been closed.")
 
 def start_script_b():
+    global current_process
+    if current_process is not None:
+        current_process.terminate()
+        current_process.wait()
     print("Starting script B...")
-    subprocess.call(["python", script_b_path])
+    current_process = subprocess.Popen(["python", script_b_path])
+    current_process.wait()
     print("Script B has been closed.")
 
 def start_script_c():
+    global current_process
+    if current_process is not None:
+        current_process.terminate()
+        current_process.wait()
     print("Starting script C...")
-    subprocess.call(["python", script_c_path])
+    current_process = subprocess.Popen(["python", script_c_path])
+    current_process.wait()
     print("Script C has been closed.")
-
+    
 def main_program():
     print("ANGIO_SIM is running.")
     running = True
     while running:
         # Check for key press events
-        if keyboard.is_pressed('a'):
+        if keyboard.is_pressed('1'):
             start_script_a()
-        elif keyboard.is_pressed('s'):
+        elif keyboard.is_pressed('2'):
             start_script_b()
-        elif keyboard.is_pressed('d'):
+        elif keyboard.is_pressed('3'):
             start_script_c()
-        elif keyboard.is_pressed('esc'):
+        elif keyboard.is_pressed('7'):
             running = False
             print("ANGIO_SIM has been closed.")
         else:
